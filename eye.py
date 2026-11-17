@@ -10,6 +10,8 @@ def main():
     pygame.display.set_caption("THE EYE")
     running = True
 
+    brightness = load_brightness("eye.png", (100, 123))
+
     # The loop
     while running is True:
 
@@ -23,7 +25,7 @@ def main():
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    print("Exisiting the game...")
+                    print("Exiting the game...")
                     running = False
 
         # 2. UPDATE
@@ -37,6 +39,26 @@ def main():
 
     # Clean up
     pygame.quit()
+
+def load_brightness(path, target_size):
+
+    image = pygame.image.load(path)
+    print(image.get_size())
+
+    small = pygame.transform.smoothscale(image, target_size)
+    print(small.get_size())
+
+    pixels = pygame.surfarray.array3d(small)
+    print(pixels.shape)
+
+    brightness = pixels.mean(axis=2)
+    print(brightness.shape)
+
+    brightness = brightness / 255
+    print(brightness.min(), brightness.max())
+
+
+    return brightness
 
 if __name__ == "__main__":
     main()
