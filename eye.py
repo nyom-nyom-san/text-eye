@@ -1,5 +1,5 @@
 import pygame
-WIDTH, HEIGHT = 900, 600
+WIDTH, HEIGHT, CELL = 1800, 1200, 8
 
 def main():
 
@@ -11,6 +11,8 @@ def main():
     running = True
 
     brightness = load_brightness("eye.png", (100, 123))
+    cols, rows = brightness.shape
+
 
     # The loop
     while running is True:
@@ -30,10 +32,18 @@ def main():
 
         # 2. UPDATE
 
-        # 3. Draw
+        # 3. FILL up color
         screen.fill((26, 0, 51))
+        for x in range(cols):
+            for y in range(rows):
+                value = brightness[x,y]
+                gray = int(value * 255)
+                color = (gray, gray, gray)
+                pygame.draw.rect(screen, color, (x * CELL, y * CELL, CELL, CELL))
+                size = (CELL, CELL)
 
-        #flip the display to screen
+
+        # flip the display to screen
         pygame.display.flip()
 
 
