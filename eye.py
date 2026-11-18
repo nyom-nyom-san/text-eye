@@ -1,5 +1,9 @@
 import pygame
-WIDTH, HEIGHT, CELL = 1800, 1200, 8
+WIDTH, HEIGHT = 1800, 1200
+CELL = 6
+FONT_SIZE = 8
+GRID_SIZE = (100,123)
+CHARS = " .:+*%#@"
 
 def main():
 
@@ -10,8 +14,11 @@ def main():
     pygame.display.set_caption("THE EYE")
     running = True
 
-    brightness = load_brightness("eye.png", (100, 123))
+    brightness = load_brightness("eye.png", GRID_SIZE)
     cols, rows = brightness.shape
+
+    font = pygame.font.SysFont("consolas", FONT_SIZE)
+    glyphs = build_glyphs(font)
 
 
     # The loop
@@ -32,15 +39,18 @@ def main():
 
         # 2. UPDATE
 
-        # 3. FILL up color
+        # 3. DRAW
+
+        # filling up the color
         screen.fill((26, 0, 51))
+
         for x in range(cols):
             for y in range(rows):
-                value = brightness[x,y]
-                gray = int(value * 255)
-                color = (gray, gray, gray)
-                pygame.draw.rect(screen, color, (x * CELL, y * CELL, CELL, CELL))
-                size = (CELL, CELL)
+                ink = 1 - brightness[x,y]
+                index  = int (ink * (len(CHARS) - 1))
+                if index == 0:
+                    continue
+                screen.blit(glyphs[index], (x * CELL, y * CELL))
 
 
         # flip the display to screen
@@ -49,6 +59,16 @@ def main():
 
     # Clean up
     pygame.quit()
+
+
+def build_glyphs(font):
+    glyphs = []
+    for i, ch in enumerate(CHARS):
+        level = i / (len(CHARS) - 1)
+        shade = int(80 + 175 * level)
+        color = (shade // 3, shade, shade)
+        glyphs.append(font.render(ch, True, color))
+    return glyphs
 
 def load_brightness(path, target_size):
 
