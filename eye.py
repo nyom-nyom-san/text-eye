@@ -22,6 +22,8 @@ def main():
     glyphs = build_glyphs(font)
 
     ink_grid = ink_from_brightness(brightness)
+    eye_layer = build_text_layer(ink_grid, glyphs)
+
 
 
     # The loop
@@ -46,14 +48,7 @@ def main():
 
         # filling up the color
         screen.fill((26, 0, 51))
-
-        for x in range(cols):
-            for y in range(rows):
-                ink = ink_grid[x,y]
-                index  = int (ink * (len(CHARS) - 1))
-                if index == 0:
-                    continue
-                screen.blit(glyphs[index], (x * CELL, y * CELL))
+        screen.blit((eye_layer), (0,0))
 
 
         # flip the display to screen
@@ -72,6 +67,19 @@ def build_glyphs(font):
         color = (shade // 3, shade, shade)
         glyphs.append(font.render(ch, True, color))
     return glyphs
+
+def build_text_layer(ink_grid, glyphs):
+    cols, rows = ink_grid.shape
+    layer = pygame.Surface((cols * CELL, rows * CELL), pygame.SRCALPHA)
+    for x in range(cols):
+        for y in range(rows):
+            ink = ink_grid[x,y]
+            index  = int (ink * (len(CHARS) - 1))
+            if index == 0:
+                continue
+            layer.blit(glyphs[index], (x * CELL, y * CELL))
+
+    return layer
 
 def ink_from_brightness(brightness):
 
