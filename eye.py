@@ -1,4 +1,5 @@
 import pygame
+import numpy
 WIDTH, HEIGHT = 1800, 1200
 CELL = 6
 FONT_SIZE = 8
@@ -19,6 +20,8 @@ def main():
 
     font = pygame.font.SysFont("consolas", FONT_SIZE)
     glyphs = build_glyphs(font)
+
+    ink_grid = ink_from_brightness(brightness)
 
 
     # The loop
@@ -46,7 +49,7 @@ def main():
 
         for x in range(cols):
             for y in range(rows):
-                ink = 1 - brightness[x,y]
+                ink = ink_grid[x,y]
                 index  = int (ink * (len(CHARS) - 1))
                 if index == 0:
                     continue
@@ -70,22 +73,34 @@ def build_glyphs(font):
         glyphs.append(font.render(ch, True, color))
     return glyphs
 
+def ink_from_brightness(brightness):
+
+    #contrasting the ink
+    ink = 1 - brightness
+    lo = 0.3
+    hi = 0.95
+    ink = (ink - lo) / (hi - lo)
+    ink = numpy.clip(ink, 0, 1)
+    ink = ink ** 0.7
+
+    return ink
+
 def load_brightness(path, target_size):
 
     image = pygame.image.load(path)
-    print(image.get_size())
+    # print(image.get_size())
 
     small = pygame.transform.smoothscale(image, target_size)
-    print(small.get_size())
+    # print(small.get_size())
 
     pixels = pygame.surfarray.array3d(small)
-    print(pixels.shape)
+    # print(pixels.shape)
 
     brightness = pixels.mean(axis=2)
-    print(brightness.shape)
+    # print(brightness.shape)
 
     brightness = brightness / 255
-    print(brightness.min(), brightness.max())
+    # print(brightness.min(), brightness.max())
 
 
     return brightness
