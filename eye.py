@@ -27,6 +27,7 @@ def main():
     eye_layer = build_text_layer(ink_grid, glyphs)
 
     blink = BlinkController()
+    layer_w, layer_h = eye_layer.get_size()
 
 
 
@@ -45,15 +46,27 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     print("Exiting the game...")
                     running = False
+                    
+                elif event.key == pygame.K_SPACE:
+                    blink.trigger_blink()
 
         # 2. UPDATE
         blink.update(dt)
 
         # 3. DRAW
+        openness = blink.openness
+        new_h = max(1, int(layer_h * openness))
+        squashed = pygame.transform.smoothscale(eye_layer, (layer_w, new_h))
+
+        # keeping the squashed layer centered
+        left = (WIDTH - layer_w) // 2
+        center_y = HEIGHT // 2 
+
+        top = center_y - new_h  // 2
 
         # filling up the color
         screen.fill((26, 0, 51))
-        screen.blit((eye_layer), (0,0))
+        screen.blit(squashed, (left, top))
 
 
         # flip the display to screen
@@ -100,6 +113,9 @@ class BlinkController:
                     self.timer = 0
         return self.openness
 
+    def trigger_blink(self):
+        self.state = "closing"
+        self.timer = 0.0
 
 def build_glyphs(font):
     glyphs = []
