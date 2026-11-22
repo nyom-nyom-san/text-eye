@@ -1,5 +1,7 @@
 import pygame
 import numpy
+import random
+
 WIDTH, HEIGHT = 1800, 1200
 CELL = 6
 FONT_SIZE = 8
@@ -24,6 +26,8 @@ def main():
     ink_grid = ink_from_brightness(brightness)
     eye_layer = build_text_layer(ink_grid, glyphs)
 
+    blink = BlinkController()
+
 
 
     # The loop
@@ -43,6 +47,7 @@ def main():
                     running = False
 
         # 2. UPDATE
+        blink.update(dt)
 
         # 3. DRAW
 
@@ -57,6 +62,43 @@ def main():
 
     # Clean up
     pygame.quit()
+
+class BlinkController:
+    def __init__(self):
+        self.state = "waiting"
+        self.timer = 0.0
+        self.wait_duration = random.uniform(2.0, 5.0)
+        self.close_duration = 0.1
+        self.open_duration = 0.15
+        self.openness = 1.0
+
+
+    def update(self, dt):
+        self.timer += dt
+
+        match self.state:
+            case "waiting":
+                if self.timer >= self.wait_duration:
+                    self.state = "closing"
+                    self.timer = 0.0
+
+            case "closing":
+                progress = min(1.0, self.timer / self.close_duration)
+                self.openness = 1 - progress
+                if self.timer >= self.close_duration:
+                    self.openness = 0
+                    self.state = "opening"
+                    self.timer = 0.0
+
+            case "opening":
+                progress = min(1.0, self.timer / self.open_duration)
+                self.openness = progress
+                if progress >= 1:
+                    self.openness = 1.0
+                    self.state = "waiting"
+                    self.wait_duration = random.uniform(2.0, 5.0)
+                    self.timer = 0
+        return self.openness
 
 
 def build_glyphs(font):
