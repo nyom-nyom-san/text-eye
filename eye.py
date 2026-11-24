@@ -2,7 +2,8 @@ import pygame
 import numpy
 import random
 
-
+x0, y0, x1, y1 = 0.3, 0.34, 0.8, 0.62
+# EYE_BOX = (x0, y0, x1, y1)
 CHARS = " .:+*%#@"
 
 def main():
@@ -10,7 +11,7 @@ def main():
     #SetUP
     pygame.init()
     desktop_w, desktop_h = pygame.display.get_desktop_sizes()[0]
-    print(pygame.display.get_desktop_sizes())
+    # print(pygame.display.get_desktop_sizes())
     win_w = int(desktop_w * 0.75)
     win_h  = int(desktop_h * 0.75)
     screen = pygame.display.set_mode((win_w, win_h))
@@ -64,10 +65,20 @@ def main():
 
         top = center_y - new_h  // 2
 
+        # finding the rectngle
+        picture_top = center_y - layer_h // 2
+
+        box_x = left + x0 * layer_w
+        box_y = picture_top + y0* layer_h
+        box_w = (x1 - x0) * layer_w
+        box_h = (y1 - y0) * layer_h
+
         # filling up the color
         screen.fill((26, 0, 51))
         screen.blit(squashed, (left, top))
 
+        rect = (int(box_x), int(box_y), int(box_w), int(box_h))
+        pygame.draw.rect(screen, (255, 80, 80), rect, 1)
 
         # flip the display to screen
         pygame.display.flip()
