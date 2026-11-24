@@ -2,7 +2,6 @@ import pygame
 import numpy
 import random
 
-WIDTH, HEIGHT = 1800, 1200
 CELL = 6
 FONT_SIZE = 8
 GRID_SIZE = (100,123)
@@ -12,7 +11,13 @@ def main():
 
     #SetUP
     pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    desktop_w, desktop_h = pygame.display.get_desktop_sizes()[0]
+    print(pygame.display.get_desktop_sizes())
+    win_w = int(desktop_w * 0.75)
+    win_h  = int(desktop_h * 0.75)
+    screen = pygame.display.set_mode((win_w, win_h))
+
+
     clock = pygame.time.Clock()
     pygame.display.set_caption("THE EYE")
     running = True
@@ -28,14 +33,6 @@ def main():
 
     blink = BlinkController()
     layer_w, layer_h = eye_layer.get_size()
-
-
-    desktop_w, desktop_h = pygame.display.get_desktop_sizes()
-    win_w = int(desktop_w, * 0.75)
-    win_h  = int(desktop_h * 0.75)
-    screen = set_mode((win_w, win_h))
-
-
 
     # The loop
     while running is True:
@@ -68,8 +65,9 @@ def main():
         squashed = pygame.transform.smoothscale(eye_layer, (layer_w, new_h))
 
         # keeping the squashed layer centered
-        left = (WIDTH - layer_w) // 2
-        center_y = HEIGHT // 2 
+        current_w, current_h = screen.get_size()
+        left = (current_w - layer_w) // 2
+        center_y = current_h // 2 
 
         top = center_y - new_h  // 2
 
