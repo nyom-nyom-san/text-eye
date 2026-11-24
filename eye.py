@@ -2,9 +2,7 @@ import pygame
 import numpy
 import random
 
-CELL = 6
-FONT_SIZE = 8
-GRID_SIZE = (100,123)
+
 CHARS = " .:+*%#@"
 
 def main():
@@ -22,15 +20,7 @@ def main():
     pygame.display.set_caption("THE EYE")
     running = True
 
-    brightness = load_brightness("eye.png", GRID_SIZE)
-    cols, rows = brightness.shape
-
-    font = pygame.font.SysFont("consolas", FONT_SIZE)
-    glyphs = build_glyphs(font)
-
-    ink_grid = ink_from_brightness(brightness)
-    eye_layer = build_text_layer(ink_grid, glyphs)
-
+    eye_layer = build_for_size(win_w, win_h)
     blink = BlinkController()
     layer_w, layer_h = eye_layer.get_size()
 
@@ -55,6 +45,9 @@ def main():
 
                 elif event.key == pygame.K_f:
                     screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+                    win_w, win_h = screen.get_size()
+                    eye_layer = build_for_size(win_w, win_h)
+                    layer_w, layer_h = eye_layer.get_size()
 
         # 2. UPDATE
         blink.update(dt)
@@ -124,6 +117,20 @@ class BlinkController:
         self.state = "closing"
         self.timer = 0.0
 
+def build_for_size(win_w, win_h):
+    cell = 7
+    target_h = win_h * 0.9
+    rows = max(1, int(target_h // cell))
+    cols = max(1, int(rows * (837/ 1032)))
+    brightness = load_brightness("eye.png", (cols, rows))
+    ink_grid = ink_from_brightness(brightness)
+    font = pygame.font.SysFont("consolas", int(max(1, cell * 1.3)))
+    glyphs = build_glyphs(font)
+    layer = build_text_layer(ink_grid, glyphs, cell)
+
+    return layer
+
+
 def build_glyphs(font):
     glyphs = []
     for i, ch in enumerate(CHARS):
@@ -133,16 +140,16 @@ def build_glyphs(font):
         glyphs.append(font.render(ch, True, color))
     return glyphs
 
-def build_text_layer(ink_grid, glyphs):
+def build_text_layer(ink_grid, glyphs, cell):
     cols, rows = ink_grid.shape
-    layer = pygame.Surface((cols * CELL, rows * CELL), pygame.SRCALPHA)
+    layer = pygame.Surface((cols * cell, rows * cell), pygame.SRCALPHA)
     for x in range(cols):
         for y in range(rows):
             ink = ink_grid[x,y]
             index  = int (ink * (len(CHARS) - 1))
             if index == 0:
                 continue
-            layer.blit(glyphs[index], (x * CELL, y * CELL))
+            layer.blit(glyphs[index], (x * cell, y * cell))
 
     return layer
 
