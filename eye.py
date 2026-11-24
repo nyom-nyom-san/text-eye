@@ -30,6 +30,12 @@ def main():
     layer_w, layer_h = eye_layer.get_size()
 
 
+    desktop_w, desktop_h = pygame.display.get_desktop_sizes()
+    win_w = int(desktop_w, * 0.75)
+    win_h  = int(desktop_h * 0.75)
+    screen = set_mode((win_w, win_h))
+
+
 
     # The loop
     while running is True:
@@ -46,9 +52,12 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     print("Exiting the game...")
                     running = False
-                    
+
                 elif event.key == pygame.K_SPACE:
                     blink.trigger_blink()
+
+                elif event.key == pygame.K_f:
+                    screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 
         # 2. UPDATE
         blink.update(dt)
