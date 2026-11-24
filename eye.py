@@ -130,7 +130,6 @@ def build_for_size(win_w, win_h):
 
     return layer
 
-
 def build_glyphs(font):
     glyphs = []
     for i, ch in enumerate(CHARS):
